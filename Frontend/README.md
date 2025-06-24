@@ -1,12 +1,90 @@
-# React + Vite
+# SkillSwap Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Welcome to the **Frontend** of **SkillSwap**, a peer-to-peer learning platform that allows users to teach and learn various skills from one another. This React-based application is designed for a seamless user experience in skill discovery, scheduling sessions, messaging, and profile management.
 
-Currently, two official plugins are available:
+## Project Overview
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+SkillSwap empowers users to:
+- Register and log in securely using JWT authentication.
+- List and categorize the skills they can teach.
+- Discover available skills offered by others.
+- Request and schedule learning sessions.
+- Send and receive messages with learning partners.
+- Rate and review fellow learners and instructors.
+- Manage their profile, skills, and availability.
 
-## Expanding the ESLint configuration
+## Project Structure
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+Frontend/
+├── public/
+├── src/
+│ ├── Components/ # Reusable UI components (Navbar, Footer, etc.)
+│ ├── Pages/ # App pages (Login, Register, Profile, etc.)
+│ ├── utils/ # Utility files (PrivateRoutes, UserContext)
+│ ├── App.jsx # Root component with routing
+│ ├── main.jsx # Entry point
+│ └── index.css # Global styles
+├── .env # Environment variables
+├── package.json
+└── vite.config.js
+
+
+## Tech Stack
+
+- **Framework**: React + Vite
+- **Styling**: Tailwind CSS & Bootstrap
+- **Routing**: React Router
+- **State Management**: Context API
+- **HTTP Client**: Axios
+- **Real-Time Messaging**: Socket.io (planned)
+- **Notifications**: React Toastify
+
+## Installation
+
+### Prerequisites
+- Node.js (v18+)
+- npm
+
+### Steps
+
+1. Clone the repo:
+
+git clone https://github.com/Harshpal01/SkillSwap-Project
+cd SkillSwap-Project/Frontend
+
+2. Install dependencies:
+npm install
+
+3. Create a .env file in the root of the Frontend folder:
+VITE_LOCALHOST=http://localhost:8000
+VITE_SERVER_URL=<your-deployment-url>
+
+4. Run the development server:
+npm run dev
+
+## MVP Features
+User authentication (JWT)
+
+Skill listing with categories
+
+Skill discovery
+
+Session requests and scheduling
+
+Messaging between users
+
+Ratings and reviews
+
+Profile management
+
+## Planned Improvements
+Real-time chat with Socket.io
+
+Calendar integration
+
+Skill recommendation system
+
+Progressive Web App (PWA) support
+
+## Contributors
+Dominic Kipkorir 
