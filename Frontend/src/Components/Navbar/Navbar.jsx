@@ -4,7 +4,7 @@ import Nav from "react-bootstrap/Nav";
 import Navbar from "react-bootstrap/Navbar";
 import { Link } from "react-router-dom";
 import Offcanvas from "react-bootstrap/Offcanvas";
-import { useUser } from "../../utils/UserContext";
+import { useUser } from "../../util/UserContext";
 import { Dropdown } from "react-bootstrap";
 import { useState } from "react";
 import axios from "axios";
