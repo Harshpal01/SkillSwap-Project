@@ -3,7 +3,7 @@ import "./Profile.css";
 import Box from "./Box";
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { useUser } from "../../utils/UserContext";
+import { useUser } from "../../util/UserContext";
 import { toast } from "react-toastify";
 import axios from "axios";
 import Spinner from "react-bootstrap/Spinner";

@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import "./Report.css";
 import { useParams } from "react-router-dom";
-import { useUser } from "../../utils/UserContext";
+import { useUser } from "../../util/UserContext";
 import axios from "axios";
 import Spinner from "react-bootstrap/Spinner";
 import { toast } from "react-toastify";

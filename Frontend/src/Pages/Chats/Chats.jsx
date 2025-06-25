@@ -4,7 +4,7 @@ import ListGroup from "react-bootstrap/ListGroup";
 import Form from "react-bootstrap/Form";
 import axios from "axios";
 import { toast } from "react-toastify";
-import { useUser } from "../../utils/UserContext";
+import { useUser } from "../../util/UserContext";
 import Spinner from "react-bootstrap/Spinner";
 import { Link, useNavigate } from "react-router-dom";
 import io from "socket.io-client";
@@ -47,9 +47,11 @@ const Chats = () => {
     });
 
     useEffect(() => {
-        fetchChats();
-    }, []);
-
+        if (user) {
+            getRequests();
+        }
+    }, [user]);
+      
     useEffect(() => {
         socket = io(axios.defaults.baseURL);
         if (user) {

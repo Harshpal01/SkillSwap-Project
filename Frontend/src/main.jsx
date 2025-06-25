@@ -5,7 +5,7 @@ import "./index.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { BrowserRouter as Router } from "react-router-dom";
 import axios from "axios";
-import { UserContextProvider } from "./utils/UserContext.jsx";
+import { UserContextProvider } from "./util/UserContext.jsx";
 
 if (import.meta.env.DEV) {
     console.log("Running in development mode");

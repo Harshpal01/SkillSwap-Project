@@ -12,7 +12,7 @@ import Register from "./Pages/Register/Register";
 import Rating from "./Pages/Rating/Rating";
 import NotFound from "./Pages/NotFound/NotFound";
 import EditProfile from "./Pages/EditProfile/EditProfile";
-import PrivateRoutes from "./utils/PrivateRoutes";
+import PrivateRoutes from "./util/PrivateRoutes";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 

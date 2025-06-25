@@ -234,8 +234,9 @@ const Register = () => {
             toast.error("Enter atleast one link among portfolio, github and linkedin");
             return false;
         }
-        const githubRegex = /^(?:http(?:s)?:\/\/)?(?:www\.)?github\.com\/[a-zA-Z0-9_-]+(?:\/)?$/;
-        if (form.githubLink && githubRegex.test(form.githubLink) === false) {
+        const githubLink = form.githubLink?.trim();
+        const githubRegex = /^https?:\/\/(www\.)?github\.com\/[a-zA-Z0-9_-]+\/?$/;
+        if (githubLink && !githubRegex.test(githubLink)) {
             toast.error("Enter a valid github link");
             return false;
         }

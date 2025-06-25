@@ -3,7 +3,7 @@ import "./Rating.css"; // Assuming your CSS styles are defined in styles.css
 import { useParams } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
-import { useUser } from "../../utils/UserContext";
+import { useUser } from "../../util/UserContext";
 import { Spinner } from "react-bootstrap";
 
 const Rating = () => {

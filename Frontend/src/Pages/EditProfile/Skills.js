@@ -146,5 +146,6 @@ export const skills = [
     "Wordpress",
     "Writing",
     "Xamarin",
+    "Machine learning",
 ];
   

@@ -10,7 +10,7 @@ import axios from "axios";
 import "./EditProfile.css";
 import Badge from "react-bootstrap/Badge";
 import { v4 as uuidv4 } from "uuid";
-import { useUser } from "../../utils/UserContext";
+import { useUser } from "../../util/UserContext";
 
 const EditProfile = () => {
     const navigate = useNavigate();
