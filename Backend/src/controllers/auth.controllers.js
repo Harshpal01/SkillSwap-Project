@@ -1,82 +1,67 @@
-import dotenv from "dotenv";
-dotenv.config();
-
+import { generateJWTToken_email, generateJWTToken_username } from "../utils/generateJWTToken.js";
 import passport from "passport";
 import { Strategy as GoogleStrategy } from "passport-google-oauth20";
 import { User } from "../models/user.js";
 import { UnRegisteredUser } from "../models/unRegisteredUser.js";
-import { generateJWTToken_email, generateJWTToken_username } from "../utils/generateJWTToken.js";
+import dotenv from "dotenv";
 import { asyncHandler } from "../utils/asyncHandler.js";
+import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 
-// ✅ Use environment variable for callback URL
+dotenv.config();
+
 passport.use(
     new GoogleStrategy(
         {
             clientID: process.env.GOOGLE_CLIENT_ID,
             clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-            callbackURL: process.env.GOOGLE_CALLBACK_URL,
+            callbackURL: "/auth/google/callback",
         },
         async (accessToken, refreshToken, profile, done) => {
-            done(null, profile); // Just pass the profile to the next middleware
+            done(null, profile);
         }
     )
 );
 
-// 🔐 Step 1: Start OAuth flow
 export const googleAuthHandler = passport.authenticate("google", {
     scope: ["profile", "email"],
 });
 
-// 🔐 Step 2: Handle callback from Google
 export const googleAuthCallback = passport.authenticate("google", {
-    failureRedirect: `${process.env.FRONTEND_URL}/login`,
+    failureRedirect: "http://localhost:5173/login",
     session: false,
 });
 
-// ✅ Step 3: Process the user data and redirect accordingly
 export const handleGoogleLoginCallback = asyncHandler(async (req, res) => {
-    const { email, name, picture } = req.user._json;
+    console.log("\n******** Inside handleGoogleLoginCallback function ********");
+    // console.log("User Google Info", req.user);
 
-    // ✅ Check if user exists
-    const existingUser = await User.findOne({ email });
+    const existingUser = await User.findOne({ email: req.user._json.email });
 
     if (existingUser) {
         const jwtToken = generateJWTToken_username(existingUser);
-        const expiryDate = new Date(Date.now() + 1 * 60 * 60 * 1000); // 1 hour
-
-        res.cookie("accessToken", jwtToken, {
-            httpOnly: true,
-            secure: true,
-            sameSite: "None",
-            expires: expiryDate,
-        });
-
-        return res.redirect(`${process.env.FRONTEND_URL}/discover`);
+        const expiryDate = new Date(Date.now() + 1 * 60 * 60 * 1000);
+        res.cookie("accessToken", jwtToken, { httpOnly: true, expires: expiryDate, secure: false });
+        return res.redirect(`http://localhost:5173/discover`);
     }
 
-    // ✅ If new, create unregistered user
-    let unregisteredUser = await UnRegisteredUser.findOne({ email });
+    let unregisteredUser = await UnRegisteredUser.findOne({ email: req.user._json.email });
     if (!unregisteredUser) {
-        unregisteredUser = await UnRegisteredUser.create({ name, email, picture });
+        console.log("Creating new Unregistered User");
+        unregisteredUser = await UnRegisteredUser.create({
+            name: req.user._json.name,
+            email: req.user._json.email,
+            picture: req.user._json.picture,
+        });
     }
-
     const jwtToken = generateJWTToken_email(unregisteredUser);
-    const expiryDate = new Date(Date.now() + 30 * 60 * 1000); // 30 minutes
-
-    res.cookie("accessTokenRegistration", jwtToken, {
-        httpOnly: true,
-        secure: true,
-        sameSite: "None",
-        expires: expiryDate,
-    });
-
-    return res.redirect(`${process.env.FRONTEND_URL}/register`);
+    const expiryDate = new Date(Date.now() + 0.5 * 60 * 60 * 1000);
+    res.cookie("accessTokenRegistration", jwtToken, { httpOnly: true, expires: expiryDate, secure: false });
+    return res.redirect("http://localhost:5173/register");
 });
 
-// ✅ Logout
 export const handleLogout = (req, res) => {
+    console.log("\n******** Inside handleLogout function ********");
     res.clearCookie("accessToken");
-    res.clearCookie("accessTokenRegistration");
     return res.status(200).json(new ApiResponse(200, null, "User logged out successfully"));
 };
