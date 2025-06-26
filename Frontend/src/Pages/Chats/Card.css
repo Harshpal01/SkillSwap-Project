@@ -44,17 +44,19 @@ p {
     max-width: 100%;
     text-align: center;
     margin: 3rem;
+    margin-bottom: rem;
     overflow: hidden;
 }
 
 .card-container img {
-    border: 1px solid #fbf1a4;
+    border: 3px solid #fbf1a4;
     border-radius: 50%;
     padding: 7px;
-    height: 100px;
-    width: 100px;
-    margin: 1rem;
+    height: px;
+    width: px;
+    margin: rem;
     aspect-ratio: 1;
+
 }
 
 .prof-buttons {

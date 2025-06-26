@@ -27,66 +27,73 @@ const Discover = () => {
                 setUser(data.data);
                 localStorage.setItem("userInfo", JSON.stringify(data.data));
             } catch (error) {
-                if (error?.response?.data?.message) {
-                    toast.error(error.response.data.message);
-                }
-                localStorage.removeItem("userInfo");
-                setUser(null);
-                await axios.get("/auth/logout");
-                navigate("/login");
+                handleLogout(error);
             }
         };
 
         const getDiscoverUsers = async () => {
             try {
                 const { data } = await axios.get("/user/discover");
-                setDiscoverUsers(data.data.forYou);
-                setWebDevUsers(data.data.webDev);
-                setMlUsers(data.data.ml);
-                setOtherUsers(data.data.others);
+                setDiscoverUsers(data.data.forYou || []);
+                setWebDevUsers(data.data.webDev || []);
+                setMlUsers(data.data.ml || []);
+                setOtherUsers(data.data.others || []);
             } catch (error) {
-                if (error?.response?.data?.message) {
-                    toast.error(error.response.data.message);
-                }
-                localStorage.removeItem("userInfo");
-                setUser(null);
-                await axios.get("/auth/logout");
-                navigate("/login");
+                handleLogout(error);
             } finally {
                 setLoading(false);
             }
+        };
+
+        const handleLogout = async (error) => {
+            if (error?.response?.data?.message) {
+                toast.error(error.response.data.message);
+            }
+            localStorage.removeItem("userInfo");
+            setUser(null);
+            await axios.get("/auth/logout");
+            navigate("/login");
         };
 
         getUser();
         getDiscoverUsers();
     }, []);
 
+    const renderUserSection = (title, id, users) => (
+        <>
+            <h2 id={id} className="section-title">{title}</h2>
+            <div className="profile-cards">
+                {users.length > 0 ? (
+                    users.map((user) => (
+                        <ProfileCard
+                            key={user?.username}
+                            profileImageUrl={user?.picture}
+                            name={user?.name}
+                            rating={user?.rating || 5}
+                            bio={user?.bio}
+                            skills={user?.skillsProficientAt}
+                            username={user?.username}
+                        />
+                    ))
+                ) : (
+                    <h4 style={{ color: "#fbf1a4" }}>No users to show</h4>
+                )}
+            </div>
+        </>
+    );
+
     return (
         <div className="discover-page">
             <div className="content-container">
                 <div className="nav-bar">
                     <Nav defaultActiveKey="/home" className="flex-column">
-                        <Nav.Link href="#for-you" className="navlink" id="foryou">
-                            For You
-                        </Nav.Link>
-                        <Nav.Link href="#popular" className="navlink" id="popular1">
-                            Popular
-                        </Nav.Link>
-                        <Nav.Link href="#web-development" className="navlink">
-                            Web Development
-                        </Nav.Link>
-                        <Nav.Link href="#machine-learning" className="navlink">
-                            Machine Learning
-                        </Nav.Link>
-                        <Nav.Link href="#graphic-design" className="navlink">
-                            Graphic Design
-                        </Nav.Link>
-                        <Nav.Link href="#soft-skills" className="navlink">
-                            Soft Skills
-                        </Nav.Link>
-                        <Nav.Link href="#others" className="navlink">
-                            Others
-                        </Nav.Link>
+                        <Nav.Link href="#for-you" className="navlink">For You</Nav.Link>
+                        <Nav.Link href="#popular" className="navlink">Popular</Nav.Link>
+                        <Nav.Link href="#web-development" className="navlink">Web Development</Nav.Link>
+                        <Nav.Link href="#machine-learning" className="navlink">Machine Learning</Nav.Link>
+                        <Nav.Link href="#graphic-design" className="navlink">Graphic Design</Nav.Link>
+                        <Nav.Link href="#soft-skills" className="navlink">Soft Skills</Nav.Link>
+                        <Nav.Link href="#others" className="navlink">Others</Nav.Link>
                     </Nav>
                 </div>
 
@@ -97,9 +104,7 @@ const Discover = () => {
                         </div>
                     ) : (
                         <>
-                            <div>
-                                <Search />
-                            </div>
+                            <Search />
 
                             <h1 id="for-you" style={{ fontFamily: "Josefin Sans, sans-serif", color: "#fbf1a4", marginTop: "2rem", marginBottom: "1rem" }}>
                                 For You
@@ -118,63 +123,28 @@ const Discover = () => {
                                         />
                                     ))
                                 ) : (
-                                    <h1 style={{ color: "#fbf1a4" }}>No users to show</h1>
+                                    <h4 style={{ color: "#fbf1a4" }}>No users to show</h4>
                                 )}
                             </div>
 
-                            <h1 id="popular" style={{ fontFamily: "Josefin Sans, sans-serif", color: "#fbf1a4", marginTop: "1rem", marginBottom: "3rem" }}>
+                            <h1 id="popular" style={{ fontFamily: "Josefin Sans, sans-serif", color: "#fbf1a4", marginTop: "2rem", marginBottom: "1rem" }}>
                                 Popular
                             </h1>
 
-                            <h2 id="web-development">Web Development</h2>
-                            <div className="profile-cards">
-                                {webDevUsers.length > 0 ? (
-                                    webDevUsers.map((user) => (
-                                        <ProfileCard
-                                            key={user?.username}
-                                            profileImageUrl={user?.picture}
-                                            name={user?.name}
-                                            rating={4}
-                                            bio={user?.bio}
-                                            skills={user?.skillsProficientAt}
-                                            username={user?.username}
-                                        />
-                                    ))
-                                ) : (
-                                    <h1 style={{ color: "#fbf1a4" }}>No users to show</h1>
-                                )}
-                            </div>
+                            {renderUserSection("Web Development", "web-development", webDevUsers)}
+                            {renderUserSection("Machine Learning", "machine-learning", mlUsers)}
 
-                            <h2 id="machine-learning">Machine Learning</h2>
-                            <div className="profile-cards">
-                                {mlUsers.length > 0 ? (
-                                    mlUsers.map((user) => (
-                                        <ProfileCard
-                                            key={user?.username}
-                                            profileImageUrl={user?.picture}
-                                            name={user?.name}
-                                            rating={4}
-                                            bio={user?.bio}
-                                            skills={user?.skillsProficientAt}
-                                            username={user?.username}
-                                        />
-                                    ))
-                                ) : (
-                                    <h1 style={{ color: "#fbf1a4" }}>No users to show</h1>
-                                )}
-                            </div>
-
-                            <h2 id="graphic-design">Graphic Design</h2>
+                            <h2 id="graphic-design" className="section-title">Graphic Design</h2>
                             <div className="profile-cards">
                                 <ProfileCard
-                                    profileImageUrl="profile-image-url"
+                                    profileImageUrl="/assets/images/profile.jpg"
                                     name="Graphic Designer One"
                                     rating={5}
                                     bio="Experienced in UI/UX and visual design."
                                     skills={["Figma", "Adobe XD", "Photoshop"]}
                                 />
                                 <ProfileCard
-                                    profileImageUrl="profile-image-url"
+                                    profileImageUrl="/assets/images/profile3.jpg"
                                     name="Graphic Designer Two"
                                     rating={5}
                                     bio="Freelance designer with a focus on branding."
@@ -182,17 +152,17 @@ const Discover = () => {
                                 />
                             </div>
 
-                            <h2 id="soft-skills">Soft Skills</h2>
+                            <h2 id="soft-skills" className="section-title">Soft Skills</h2>
                             <div className="profile-cards">
                                 <ProfileCard
-                                    profileImageUrl="profile-image-url"
+                                    profileImageUrl="/assets/images/profile4.jpg"
                                     name="Coach One"
                                     rating={5}
                                     bio="Soft skills coach with 10+ years of experience."
                                     skills={["Public Speaking", "Leadership", "Empathy"]}
                                 />
                                 <ProfileCard
-                                    profileImageUrl="profile-image-url"
+                                    profileImageUrl="/assets/images/profile5.jpg"
                                     name="Mentor Two"
                                     rating={5}
                                     bio="Mentor helping students grow their communication skills."
@@ -200,24 +170,7 @@ const Discover = () => {
                                 />
                             </div>
 
-                            <h2 id="others">Others</h2>
-                            <div className="profile-cards">
-                                {otherUsers.length > 0 ? (
-                                    otherUsers.map((user) => (
-                                        <ProfileCard
-                                            key={user?.username}
-                                            profileImageUrl={user?.picture}
-                                            name={user?.name}
-                                            rating={4}
-                                            bio={user?.bio}
-                                            skills={user?.skillsProficientAt}
-                                            username={user?.username}
-                                        />
-                                    ))
-                                ) : (
-                                    <h1 style={{ color: "#fbf1a4" }}>No users to show</h1>
-                                )}
-                            </div>
+                            {renderUserSection("Others", "others", otherUsers)}
                         </>
                     )}
                 </div>
