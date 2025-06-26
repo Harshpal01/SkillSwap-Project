@@ -6,7 +6,8 @@ const Login = () => {
     const [isHovered, setIsHovered] = useState(false); // State for hover effect
 
     const handleGoogleLogin = () => {
-        window.location.href = "https://skillswap-project-u8i3.onrender.com/auth/google";
+        window.location.href = `${import.meta.env.VITE_SERVER_URL}/auth/google`; 
+
     };
 
     const containerStyle = {
