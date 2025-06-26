@@ -1,21 +1,21 @@
-import { generateJWTToken_email, generateJWTToken_username } from "../utils/generateJWTToken.js";
+import dotenv from "dotenv";
+dotenv.config();
+
 import passport from "passport";
 import { Strategy as GoogleStrategy } from "passport-google-oauth20";
 import { User } from "../models/user.js";
 import { UnRegisteredUser } from "../models/unRegisteredUser.js";
-import dotenv from "dotenv";
+import { generateJWTToken_email, generateJWTToken_username } from "../utils/generateJWTToken.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
-import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 
-dotenv.config();
 
 passport.use(
     new GoogleStrategy(
         {
             clientID: process.env.GOOGLE_CLIENT_ID,
             clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-            callbackURL: "/auth/google/callback",
+            callbackURL: process.env.GOOGLE_CALLBACK_URL,
         },
         async (accessToken, refreshToken, profile, done) => {
             done(null, profile);
@@ -23,45 +23,54 @@ passport.use(
     )
 );
 
+// Step 1: Redirect to Google
 export const googleAuthHandler = passport.authenticate("google", {
     scope: ["profile", "email"],
 });
 
+// Step 2: Google callback
 export const googleAuthCallback = passport.authenticate("google", {
-    failureRedirect: "http://localhost:5173/login",
+    failureRedirect: `${process.env.FRONTEND_URL}/login`,
     session: false,
 });
 
+// Step 3: Handle login result
 export const handleGoogleLoginCallback = asyncHandler(async (req, res) => {
-    console.log("\n******** Inside handleGoogleLoginCallback function ********");
-    // console.log("User Google Info", req.user);
+    const { name, email, picture } = req.user._json;
 
-    const existingUser = await User.findOne({ email: req.user._json.email });
+    const existingUser = await User.findOne({ email });
 
     if (existingUser) {
         const jwtToken = generateJWTToken_username(existingUser);
-        const expiryDate = new Date(Date.now() + 1 * 60 * 60 * 1000);
-        res.cookie("accessToken", jwtToken, { httpOnly: true, expires: expiryDate, secure: false });
-        return res.redirect(`http://localhost:5173/discover`);
+        const expiryDate = new Date(Date.now() + 60 * 60 * 1000);
+        res.cookie("accessToken", jwtToken, {
+            httpOnly: true,
+            secure: true,
+            sameSite: "None",
+            expires: expiryDate,
+        });
+        return res.redirect(`${process.env.FRONTEND_URL}/discover`);
     }
 
-    let unregisteredUser = await UnRegisteredUser.findOne({ email: req.user._json.email });
+    let unregisteredUser = await UnRegisteredUser.findOne({ email });
     if (!unregisteredUser) {
-        console.log("Creating new Unregistered User");
-        unregisteredUser = await UnRegisteredUser.create({
-            name: req.user._json.name,
-            email: req.user._json.email,
-            picture: req.user._json.picture,
-        });
+        unregisteredUser = await UnRegisteredUser.create({ name, email, picture });
     }
+
     const jwtToken = generateJWTToken_email(unregisteredUser);
-    const expiryDate = new Date(Date.now() + 0.5 * 60 * 60 * 1000);
-    res.cookie("accessTokenRegistration", jwtToken, { httpOnly: true, expires: expiryDate, secure: false });
-    return res.redirect("http://localhost:5173/register");
+    const expiryDate = new Date(Date.now() + 30 * 60 * 1000);
+    res.cookie("accessTokenRegistration", jwtToken, {
+        httpOnly: true,
+        secure: true,
+        sameSite: "None",
+        expires: expiryDate,
+    });
+    return res.redirect(`${process.env.FRONTEND_URL}/register`);
 });
 
+// Logout
 export const handleLogout = (req, res) => {
-    console.log("\n******** Inside handleLogout function ********");
     res.clearCookie("accessToken");
+    res.clearCookie("accessTokenRegistration");
     return res.status(200).json(new ApiResponse(200, null, "User logged out successfully"));
 };
